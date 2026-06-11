@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agro Scala</title>
+  <style>
+    :root {
+      --bg: #061008;
+      --bg-soft: #0e1810;
+      --panel: rgba(15, 20, 15, 0.72);
+      --text: #f4f7ef;
+      --muted: #a7b3a5;
+      --lime: #cfff45;
+      --forest: #4f8450;
+      --sand: #d7c07f;
+      --shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
+      --radius-lg: 28px;
+      --radius-md: 20px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 18% 22%, rgba(177, 255, 66, 0.18), transparent 24%),
+        radial-gradient(circle at 82% 12%, rgba(79, 132, 80, 0.2), transparent 22%),
+        radial-gradient(circle at 50% 78%, rgba(215, 192, 127, 0.08), transparent 28%),
+        linear-gradient(180deg, #081109 0%, #050705 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+      background-size: 72px 72px;
+      mask-image: linear-gradient(180deg, rgba(255, 255, 255, 0.55), transparent 90%);
+      pointer-events: none;
+    }
+
+    .page-shell {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .site-header {
+      position: sticky;
+      top: 18px;
+      z-index: 20;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      width: min(1180px, calc(100% - 32px));
+      margin: 18px auto 0;
+      padding: 14px 18px;
+      border: 1px solid rgba(222, 255, 171, 0.18);
+      border-radius: 999px;
+      background: rgba(12, 15, 12, 0.72);
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .brand-mark {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(207, 255, 69, 0.92), rgba(123, 186, 48, 0.88));
+      color: #071007;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1;
+      letter-spacing: 0.18em;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    }
+
+    .brand-text strong {
+      font-size: 1rem;
+    }
+
+    .brand-text span {
+      margin-top: 5px;
+      color: var(--lime);
+      font-size: 0.72rem;
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 28px;
+    }
+
+    .site-nav a,
+    .header-cta {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.95rem;
+    }
+
+    .site-nav a:hover,
+    .site-nav a:focus-visible,
+    .header-cta:hover,
+    .header-cta:focus-visible {
+      color: var(--text);
+    }
+
+    .header-cta {
+      padding: 12px 18px;
+      border-radius: 999px;
+      color: #071007;
+      background: linear-gradient(135deg, #deff7b, var(--lime));
+      box-shadow: 0 0 28px rgba(207, 255, 69, 0.3);
+    }
+
+    main {
+      width: min(1200px, calc(100% - 32px));
+      margin: 0 auto;
+    }
+
+    section {
+      position: relative;
+    }
+
+    .hero-section {
+      display: grid;
+      grid-template-columns: minmax(0, 1.06fr) minmax(420px, 0.94fr);
+      align-items: center;
+      gap: 38px;
+      min-height: calc(100vh - 90px);
+      padding: 104px 0 72px;
+    }
+
+    .eyebrow {
+      margin: 0 0 20px;
+      color: var(--lime);
+      font-size: 0.82rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .hero-copy h1,
+    .section-heading h2,
+    .cta-panel h2 {
+      margin: 0;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .hero-copy h1 {
+      max-width: 11ch;
+      font-size: clamp(3.5rem, 7vw, 6.4rem);
+      line-height: 0.95;
+    }
+
+    .hero-copy h1 span {
+      color: var(--lime);
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .hero-text {
+      max-width: 640px;
+      margin: 28px 0 0;
+      color: var(--muted);
+      font-size: 1.15rem;
+      line-height: 1.75;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 34px;
+    }
+
+    .primary-button,
+    .secondary-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 56px;
+      padding: 0 24px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+
+    .primary-button {
+      color: #071007;
+      background: linear-gradient(135deg, #ecff9f, #b7f941);
+      box-shadow: 0 0 40px rgba(207, 255, 69, 0.22);
+    }
+
+    .secondary-button {
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.16);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .hero-meta {
+      display: grid;
+      gap: 12px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+      color: #d3dccf;
+    }
+
+    .hero-trust {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin: 22px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .hero-trust li {
+      padding: 10px 14px;
+      border: 1px solid rgba(255, 255, 255, 0.09);
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.03);
+      color: #dce7d7;
+      font-size: 0.92rem;
+    }
+
+    .hero-meta li {
+      position: relative;
+      padding-left: 22px;
+    }
+
+    .hero-meta li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0.6em;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #e9ff8e 0%, #a8ec37 70%, transparent 75%);
+      box-shadow: 0 0 18px rgba(207, 255, 69, 0.38);
+    }
+
+    .hero-visual {
+      position: relative;
+      min-height: 720px;
+    }
+
+    .hero-glow {
+      position: absolute;
+      inset: 12% 16% auto 18%;
+      height: 58%;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at center, rgba(207, 255, 69, 0.32), rgba(207, 255, 69, 0.08) 34%, transparent 58%);
+      filter: blur(20px);
+    }
+
+    .hero-orbit {
+      position: absolute;
+      border: 1px solid rgba(207, 255, 69, 0.18);
+      border-radius: 50%;
+    }
+
+    .orbit-a {
+      inset: 8% 2% 22% 12%;
+    }
+
+    .orbit-b {
+      inset: 22% 14% 6% 0;
+    }
+
+    .hero-panel,
+    .value-card,
+    .operation-card,
+    .status-board,
+    .palette-block,
+    .principles-block article,
+    .cta-panel {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+        rgba(11, 15, 11, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    .hero-panel {
+      position: absolute;
+      border: 1px solid rgba(216, 255, 143, 0.12);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+        rgba(10, 14, 10, 0.76);
+      backdrop-filter: blur(18px);
+    }
+
+    .lead-panel {
+      top: 7%;
+      right: 6%;
+      width: min(88%, 420px);
+      padding: 28px;
+    }
+
+    .panel-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      color: var(--lime);
+      background: rgba(255, 255, 255, 0.04);
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .panel-tag::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 16px rgba(207, 255, 69, 0.48);
+    }
+
+    .lead-panel h2,
+    .operation-card h3,
+    .value-card h3,
+    .journey-step h3,
+    .status-header strong,
+    .principles-block h3 {
+      margin: 18px 0 0;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    }
+
+    .lead-panel p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .panel-metric {
+      margin-top: 22px;
+      padding: 18px;
+      border: 1px solid rgba(207, 255, 69, 0.12);
+      border-radius: var(--radius-md);
+      background: rgba(207, 255, 69, 0.06);
+    }
+
+    .panel-metric strong,
+    .status-header p {
+      display: block;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    }
+
+    .panel-metric span,
+    .status-board li,
+    .operation-card p,
+    .value-card p,
+    .journey-step p,
+    .principles-block p,
+    .palette-block p,
+    .cta-panel p {
+      color: var(--muted);
+    }
+
+    .path-panel {
+      left: 0;
+      bottom: 20%;
+      width: min(78%, 390px);
+      padding: 22px 20px;
+    }
+
+    .step-line {
+      display: grid;
+      grid-template-columns: auto 1fr auto 1fr auto 1fr auto;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .step {
+      display: grid;
+      place-items: center;
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.03);
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    }
+
+    .step.active,
+    .journey-step span,
+    .icon-box {
+      color: #061008;
+      background: linear-gradient(135deg, #ebff9d, #b7f941);
+    }
+
+    .connector {
+      height: 1px;
+      background: linear-gradient(90deg, rgba(207, 255, 69, 0.2), rgba(207, 255, 69, 0.72));
+    }
+
+    .path-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 14px;
+      color: #dbe7d5;
+      font-size: 0.82rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .dashboard-panel {
+      right: 9%;
+      bottom: 3%;
+      width: min(84%, 440px);
+      padding: 22px;
+    }
+
+    .graph {
+      position: relative;
+      height: 210px;
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(180deg, rgba(207, 255, 69, 0.08), rgba(255, 255, 255, 0.01));
+      background-size: 42px 42px, 42px 42px, cover;
+      overflow: hidden;
+    }
+
+    .graph-line {
+      position: absolute;
+      inset: auto 0 0 0;
+      height: 100%;
+      background-repeat: no-repeat;
+      background-size: 100% 100%;
+    }
+
+    .line-one {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 180 C80 166 80 128 150 132 C220 137 215 196 283 168 C350 141 356 114 414 126 C472 138 508 94 600 44' stroke='%23dfff7f' stroke-width='5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      opacity: 0.92;
+    }
+
+    .line-two {
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 600 240' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 196 C72 200 98 164 148 166 C198 168 248 212 316 186 C384 160 410 198 478 166 C540 136 550 122 600 102' stroke='%2372b84e' stroke-width='4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      opacity: 0.75;
+    }
+
+    .graph-pill {
+      position: absolute;
+      right: 18px;
+      top: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(207, 255, 69, 0.12);
+      color: var(--lime);
+      font-size: 0.8rem;
+    }
+
+    .logo-band {
+      padding: 20px 28px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .logo-band p {
+      margin: 0;
+      color: #dae6d4;
+      text-align: center;
+      font-size: 0.98rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    .value-section,
+    .problem-section,
+    .journey-section,
+    .operations-section,
+    .faq-section,
+    .system-section,
+    .cta-section {
+      padding: 96px 0 0;
+    }
+
+    .section-heading {
+      max-width: 760px;
+    }
+
+    .section-heading h2 {
+      font-size: clamp(2rem, 4vw, 3.6rem);
+      line-height: 1;
+    }
+
+    .value-grid,
+    .operations-grid,
+    .problem-grid,
+    .faq-list {
+      display: grid;
+      gap: 22px;
+      margin-top: 34px;
+    }
+
+    .value-grid,
+    .problem-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .value-card {
+      padding: 28px;
+    }
+
+    .problem-card,
+    .faq-item {
+      padding: 28px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+        rgba(11, 15, 11, 0.72);
+      box-shadow: var(--shadow);
+    }
+
+    .problem-card h3,
+    .faq-item h3 {
+      margin: 0;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+    }
+
+    .problem-card p,
+    .faq-item p {
+      margin: 14px 0 0;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .icon-box,
+    .journey-step span {
+      display: inline-grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      font-family: Bahnschrift, "Arial Narrow", sans-serif;
+      font-weight: 700;
+    }
+
+    .value-card p,
+    .operation-card p,
+    .journey-step p,
+    .palette-block p,
+    .principles-block p,
+    .status-board li,
+    .cta-panel p {
+      line-height: 1.7;
+    }
+
+    .journey-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+      gap: 24px;
+      margin-top: 34px;
+    }
+
+    .journey-rail {
+      display: grid;
+      gap: 18px;
+    }
+
+    .journey-step {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 18px;
+      align-items: start;
+      padding: 24px;
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: var(--radius-md);
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .journey-step h3 {
+      margin: 2px 0 0;
+    }
+
+    .status-board {
+      height: 100%;
+      padding: 28px;
+    }
+
+    .status-header {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .status-header p {
+      margin: 0;
+      color: var(--muted);
+    }
+
+    .status-header strong {
+      font-size: 1.25rem;
+    }
+
+    .status-board ul {
+      display: grid;
+      gap: 14px;
+      margin: 26px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .status-board li {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .status-board li span {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f1ffb1 0%, #b8ec3b 70%, transparent 76%);
+      box-shadow: 0 0 18px rgba(207, 255, 69, 0.3);
+    }
+
+    .operations-grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .wide-card {
+      grid-column: span 3;
+    }
+
+    .operation-card,
+    .palette-block,
+    .principles-block article,
+    .cta-panel {
+      padding: 28px;
+    }
+
+    .system-layout {
+      display: grid;
+      grid-template-columns: minmax(340px, 0.9fr) minmax(0, 1.1fr);
+      gap: 24px;
+      margin-top: 34px;
+    }
+
+    .swatches {
+      display: flex;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .swatch {
+      width: 58px;
+      height: 58px;
+      border-radius: 18px;
+    }
+
+    .swatch-dark { background: #111714; }
+    .swatch-lime { background: var(--lime); }
+    .swatch-forest { background: var(--forest); }
+    .swatch-sand { background: var(--sand); }
+
+    .principles-block {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .cta-section {
+      padding-bottom: 96px;
+    }
+
+    .cta-panel {
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+    }
+
+    .cta-panel::before {
+      content: "";
+      position: absolute;
+      inset: auto -12% -46% 52%;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(207, 255, 69, 0.24), transparent 62%);
+      pointer-events: none;
+    }
+
+    .cta-panel h2 {
+      max-width: 14ch;
+      margin: 0 auto;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+    }
+
+    .cta-panel p {
+      max-width: 720px;
+      margin: 18px auto 0;
+    }
+
+    .cta-panel .primary-button {
+      margin-top: 28px;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 700ms ease, transform 700ms ease;
+    }
+
+    .reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 1100px) {
+      .site-header {
+        width: min(100% - 24px, 1180px);
+      }
+
+      .hero-section,
+      .journey-layout,
+      .system-layout,
+      .value-grid,
+      .operations-grid,
+      .principles-block {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-section {
+        padding-top: 92px;
+      }
+
+      .hero-copy h1 {
+        max-width: 13ch;
+      }
+
+      .hero-visual {
+        min-height: 640px;
+      }
+
+      .wide-card {
+        grid-column: span 1;
+      }
+    }
+
+    @media (max-width: 780px) {
+      .site-header {
+        position: relative;
+        top: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+        border-radius: 28px;
+        padding: 18px;
+      }
+
+      .site-nav {
+        order: 3;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 16px 22px;
+      }
+
+      .hero-section {
+        gap: 28px;
+        min-height: auto;
+        padding: 56px 0 48px;
+      }
+
+      .hero-copy h1 {
+        font-size: clamp(2.8rem, 14vw, 4.2rem);
+      }
+
+      .hero-text {
+        font-size: 1rem;
+      }
+
+      .hero-visual {
+        min-height: 680px;
+      }
+
+      .lead-panel,
+      .dashboard-panel,
+      .path-panel {
+        width: 100%;
+        right: auto;
+        left: 0;
+      }
+
+      .lead-panel {
+        top: 0;
+      }
+
+      .path-panel {
+        bottom: 200px;
+      }
+
+      .dashboard-panel {
+        bottom: 0;
+      }
+
+      .logo-band p {
+        font-size: 0.82rem;
+        line-height: 1.6;
+      }
+
+      .value-section,
+      .problem-section,
+      .journey-section,
+      .operations-section,
+      .faq-section,
+      .system-section,
+      .cta-section {
+        padding-top: 72px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <a class="brand" href="#top" aria-label="Agro Scala">
+        <span class="brand-mark">A</span>
+        <span class="brand-text">
+          <strong>AGRO</strong>
+          <span>SCALA</span>
+        </span>
+      </a>
+      <nav class="site-nav" aria-label="Navegacao principal">
+        <a href="#proposta">Proposta</a>
+        <a href="#problema">Cenario</a>
+        <a href="#jornada">Jornada</a>
+        <a href="#operacao">Operacao</a>
+        <a href="#faq">Duvidas</a>
+      </nav>
+      <a class="header-cta" href="https://wa.me/5569999296070?text=Quero%20agendar%20uma%20consultoria%20gratuita">Falar com a Agro Scala</a>
+    </header>
+
+    <main id="top">
+      <section class="hero-section">
+        <div class="hero-copy">
+          <p class="eyebrow">Para escritorios do agro que querem crescer sem perder controle</p>
+          <h1>
+            Mais produtores atendidos,
+            <span>menos demanda perdida no caminho.</span>
+          </h1>
+          <p class="hero-text">
+            A Agro Scala organiza a jornada comercial e operacional de escritorios que trabalham com
+            credito rural e solucoes financeiras para o produtor, criando um fluxo mais claro do primeiro contato ao fechamento.
+          </p>
+          <div class="hero-actions">
+            <a class="primary-button" href="https://wa.me/5569999296070?text=Quero%20agendar%20uma%20consultoria%20gratuita">Agendar consultoria gratuita</a>
+            <a class="secondary-button" href="#jornada">Ver como funciona</a>
+          </div>
+          <ul class="hero-trust" aria-label="Reducao de duvidas">
+            <li>Consultoria inicial sem custo</li>
+            <li>Sem compromisso na primeira conversa</li>
+            <li>Leitura pratica da rotina comercial atual</li>
+          </ul>
+          <ul class="hero-meta" aria-label="Diferenciais">
+            <li>Fluxo comercial acompanhado do primeiro contato ao fechamento</li>
+            <li>Rotina operacional mais previsivel para o escritorio</li>
+            <li>Comunicacao clara para escritorio, time e produtor</li>
+          </ul>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="hero-orbit orbit-a"></div>
+          <div class="hero-orbit orbit-b"></div>
+          <div class="hero-glow"></div>
+          <div class="hero-panel lead-panel">
+            <span class="panel-tag">Fluxo ativo</span>
+            <h2>Entrada qualificada</h2>
+            <p>Contato certo, momento certo e direcao clara para o proximo passo.</p>
+            <div class="panel-metric">
+              <strong>Escala com criterio</strong>
+              <span>Sem perder a leitura da jornada.</span>
+            </div>
+          </div>
+          <div class="hero-panel path-panel">
+            <div class="step-line">
+              <span class="step active">1</span>
+              <span class="connector"></span>
+              <span class="step">2</span>
+              <span class="connector"></span>
+              <span class="step">3</span>
+              <span class="connector"></span>
+              <span class="step">4</span>
+            </div>
+            <div class="path-labels">
+              <span>Origem</span>
+              <span>Conexao</span>
+              <span>Proposta</span>
+              <span>Cliente</span>
+            </div>
+          </div>
+          <div class="hero-panel dashboard-panel">
+            <div class="graph">
+              <span class="graph-line line-one"></span>
+              <span class="graph-line line-two"></span>
+              <span class="graph-pill">Operacao em progresso</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="logo-band" aria-label="Frase de posicionamento">
+        <p>Escala, progressao, confianca e organizacao para quem atende o produtor com seriedade.</p>
+      </section>
+
+      <section class="problem-section" id="problema">
+        <div class="section-heading">
+          <p class="eyebrow">Quando a rotina trava</p>
+          <h2>O escritorio cresce na intencao, mas perde ritmo quando cada etapa depende de memoria, urgencia e improviso.</h2>
+        </div>
+        <div class="problem-grid">
+          <article class="problem-card">
+            <h3>Entradas sem leitura clara</h3>
+            <p>Chegam contatos, mas nem sempre o time sabe prioridade, contexto e proximo passo logo no inicio.</p>
+          </article>
+          <article class="problem-card">
+            <h3>Propostas sem acompanhamento firme</h3>
+            <p>O produtor demonstrou interesse, mas o retorno perde cadencia e a oportunidade esfria.</p>
+          </article>
+          <article class="problem-card">
+            <h3>Gestao comercial sem visibilidade real</h3>
+            <p>O gestor sente movimento, mas nao enxerga com clareza o que esta andando, travando ou sendo perdido.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="value-section" id="proposta">
+        <div class="section-heading">
+          <p class="eyebrow">O que muda na pratica</p>
+          <h2>Uma estrutura que aproxima escritorio, time comercial e produtor sem complicar a operacao.</h2>
+        </div>
+        <div class="value-grid">
+          <article class="value-card">
+            <span class="icon-box">01</span>
+            <h3>Receba cada oportunidade com criterio desde o primeiro contato</h3>
+            <p>Definimos como o escritorio recebe demanda, identifica contexto e orienta a conversa desde o inicio.</p>
+          </article>
+          <article class="value-card">
+            <span class="icon-box">02</span>
+            <h3>Acompanhe cada etapa sem depender de memoria ou cobranca solta</h3>
+            <p>Cada etapa fica visivel: contato, qualificacao, proposta, retorno, andamento e fechamento.</p>
+          </article>
+          <article class="value-card">
+            <span class="icon-box">03</span>
+            <h3>Traga mais previsibilidade para a rotina do time e da gestao</h3>
+            <p>O time ganha clareza sobre prioridades, responsaveis, pendencias e ritmo de acompanhamento.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="journey-section" id="jornada">
+        <div class="section-heading">
+          <p class="eyebrow">Jornada estruturada</p>
+          <h2>Da chegada do produtor ao fechamento com uma linha de acompanhamento que o escritorio consegue sustentar.</h2>
+        </div>
+        <div class="journey-layout">
+          <div class="journey-rail">
+            <article class="journey-step">
+              <span>01</span>
+              <div>
+                <h3>Primeiro contato</h3>
+                <p>O interesse entra com contexto, origem e prioridade organizados.</p>
+              </div>
+            </article>
+            <article class="journey-step">
+              <span>02</span>
+              <div>
+                <h3>Qualificacao comercial</h3>
+                <p>O escritorio entende perfil, momento e potencial de avancar com clareza.</p>
+              </div>
+            </article>
+            <article class="journey-step">
+              <span>03</span>
+              <div>
+                <h3>Conducao da proposta</h3>
+                <p>A conversa segue com cadencia, registro e proximos passos visiveis.</p>
+              </div>
+            </article>
+            <article class="journey-step">
+              <span>04</span>
+              <div>
+                <h3>Relacao que continua</h3>
+                <p>O cliente nao some do radar. O escritorio passa a operar com acompanhamento real.</p>
+              </div>
+            </article>
+          </div>
+          <div class="journey-side">
+            <div class="status-board">
+              <div class="status-header">
+                <p>Leitura da operacao</p>
+                <strong>Jornada viva</strong>
+              </div>
+              <ul>
+                <li><span></span> Entradas com criterio</li>
+                <li><span></span> Time com proximo passo definido</li>
+                <li><span></span> Propostas acompanhadas</li>
+                <li><span></span> Relacionamento recorrente</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="operations-section" id="operacao">
+        <div class="section-heading">
+          <p class="eyebrow">Clareza operacional</p>
+          <h2>Crescer fica mais facil quando a rotina comercial deixa de ser um amontoado de tarefas soltas.</h2>
+        </div>
+        <div class="operations-grid">
+          <article class="operation-card wide-card">
+            <h3>O escritorio ganha uma leitura mais executiva da propria rotina.</h3>
+            <p>Comercial, acompanhamento e passagem de bastao deixam de depender so de memoria, urgencia ou boa vontade do dia.</p>
+          </article>
+          <article class="operation-card">
+            <h3>Cadencia</h3>
+            <p>Contato, retorno e continuidade com ritmo definido.</p>
+          </article>
+          <article class="operation-card">
+            <h3>Contexto</h3>
+            <p>Cada relacao carrega historico, etapa e proximo movimento.</p>
+          </article>
+          <article class="operation-card">
+            <h3>Visibilidade</h3>
+            <p>O gestor enxerga o que esta andando, travando e pedindo ajuste.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="faq-section" id="faq">
+        <div class="section-heading">
+          <p class="eyebrow">Duvidas comuns</p>
+          <h2>Antes de qualquer decisao, o importante e entender se essa estrutura faz sentido para o seu escritorio.</h2>
+        </div>
+        <div class="faq-list">
+          <article class="faq-item">
+            <h3>Isso serve so para escritorio grande?</h3>
+            <p>Nao. A estrutura funciona justamente para escritorios que querem crescer sem perder organizacao no meio do caminho.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Precisa mudar tudo de uma vez?</h3>
+            <p>Nao. O ajuste costuma comecar pela leitura da rotina atual e pelos pontos de maior perda ou desorganizacao.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Voces entram so na parte comercial?</h3>
+            <p>A Agro Scala olha a jornada inteira, porque comercial sem operacao e acompanhamento tende a perder forca rapido.</p>
+          </article>
+          <article class="faq-item">
+            <h3>Como acontece o primeiro passo?</h3>
+            <p>A conversa inicial e gratuita e serve para entender o cenario do escritorio, os gargalos atuais e o que faz mais sentido organizar primeiro.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="system-section" id="estrutura">
+        <div class="section-heading">
+          <p class="eyebrow">Sistema visual da marca</p>
+          <h2>Uma presenca que mistura precisao, agro e leitura institucional.</h2>
+        </div>
+        <div class="system-layout">
+          <div class="palette-block">
+            <div class="swatches">
+              <span class="swatch swatch-dark"></span>
+              <span class="swatch swatch-lime"></span>
+              <span class="swatch swatch-forest"></span>
+              <span class="swatch swatch-sand"></span>
+            </div>
+            <p>Grafite profundo, verde acido, verde institucional e luz quente controlada.</p>
+          </div>
+          <div class="principles-block">
+            <article>
+              <h3>Escala</h3>
+              <p>Progressao visivel sem excesso de ruido visual.</p>
+            </article>
+            <article>
+              <h3>Confianca</h3>
+              <p>Presenca firme, limpa e segura para um setor sensivel.</p>
+            </article>
+            <article>
+              <h3>Proximidade</h3>
+              <p>Linguagem clara para quem negocia com produtor e escritorio.</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="cta-section" id="contato">
+        <div class="cta-panel">
+          <p class="eyebrow">Agro Scala</p>
+          <h2>Se o seu escritorio quer crescer com mais controle e menos perda no caminho, a proxima conversa ja pode comecar agora.</h2>
+          <p>Sem compromisso na primeira conversa. A ideia e entender o cenario atual e enxergar onde a jornada comercial pode ganhar mais clareza.</p>
+          <a class="primary-button" href="https://wa.me/5569999296070?text=Quero%20agendar%20uma%20consultoria%20gratuita">Agendar consultoria gratuita</a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const revealItems = document.querySelectorAll(
+      ".section-heading, .value-card, .journey-step, .status-board, .operation-card, .palette-block, .principles-block article, .cta-panel"
+    );
+
+    revealItems.forEach((item) => item.classList.add("reveal"));
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-visible");
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.18 }
+    );
+
+    revealItems.forEach((item) => observer.observe(item));
+  </script>
+</body>
+</html>
